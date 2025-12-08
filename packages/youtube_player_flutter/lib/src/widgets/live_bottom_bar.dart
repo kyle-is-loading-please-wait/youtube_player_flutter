@@ -63,12 +63,13 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
 
   void listener() {
     if (mounted) {
-      final double newPosition = _controller.metadata.duration.inMilliseconds == 0
-          ? 0
-          : _controller.value.position.inMilliseconds /
-          _controller.metadata.duration.inMilliseconds;
+      final double newPosition =
+          _controller.metadata.duration.inMilliseconds == 0
+              ? 0
+              : _controller.value.position.inMilliseconds /
+                  _controller.metadata.duration.inMilliseconds;
       setState(() {
-        _currentSliderPosition = max(1, newPosition);
+        _currentSliderPosition = newPosition > 1 ? 1 : newPosition;
       });
     }
   }
