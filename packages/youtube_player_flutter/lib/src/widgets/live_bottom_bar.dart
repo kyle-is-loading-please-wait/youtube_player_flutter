@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import '../utils/youtube_player_controller.dart';
@@ -61,12 +63,12 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
 
   void listener() {
     if (mounted) {
+      final double newPosition = _controller.metadata.duration.inMilliseconds == 0
+          ? 0
+          : _controller.value.position.inMilliseconds /
+          _controller.metadata.duration.inMilliseconds;
       setState(() {
-        _currentSliderPosition =
-            _controller.metadata.duration.inMilliseconds == 0
-                ? 0
-                : _controller.value.position.inMilliseconds /
-                    _controller.metadata.duration.inMilliseconds;
+        _currentSliderPosition = max(1, newPosition);
       });
     }
   }
