@@ -72,7 +72,6 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
       final double newPosition = totalTimeMs == 0 || newPositionMs < 0
           ? 0
           : newPositionMs / durationMs;
-      final f = newPosition + 1;
       setState(() {
         _currentSliderPosition = newPosition > 1 ? 1 : newPosition;
       });
@@ -107,9 +106,6 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
                   final newPosition = selectedPosition > durationMs
                       ? durationMs
                       : selectedPosition;
-
-                  final time = DateTime.now().subtract(
-                      Duration(milliseconds: newPosition));
 
                   _controller.seekTo(
                     Duration(
