@@ -230,6 +230,7 @@ class _YoutubePlayerState extends State<YoutubePlayer> {
 
   @override
   Widget build(BuildContext context) {
+    final isLive = controller.flags.isLive;
     return Material(
       elevation: 0,
       color: Colors.black,
@@ -238,57 +239,14 @@ class _YoutubePlayerState extends State<YoutubePlayer> {
         child: Container(
           color: Colors.black,
           width: widget.width ?? MediaQuery.of(context).size.width,
-          child: _buildPlayer(
-            errorWidget: Container(
-              color: Colors.black87,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 40.0, vertical: 20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.error_outline,
-                        color: Colors.white,
-                      ),
-                      const SizedBox(width: 5.0),
-                      Expanded(
-                        child: Text(
-                          errorString(
-                            controller.value.errorCode,
-                            videoId: controller.metadata.videoId.isNotEmpty
-                                ? controller.metadata.videoId
-                                : controller.initialVideoId,
-                          ),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w300,
-                            fontSize: 15.0,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16.0),
-                  Text(
-                    'Error Code: ${controller.value.errorCode}',
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          child:
+              _buildPlayer(errorWidget: _ErrorWidget(controller: controller)),
         ),
       ),
     );
   }
 
-  Widget _buildPlayer({required Widget errorWidget}) {
+  Widget _buildPlayer({required Widget errorWidget, bool isLive = false}) {
     return AspectRatio(
       aspectRatio: _aspectRatio,
       child: Stack(
@@ -306,6 +264,7 @@ class _YoutubePlayerState extends State<YoutubePlayer> {
 
               widget.onEnded?.call(metaData);
             },
+            isLive: isLive,
           ),
           if (!controller.flags.hideThumbnail)
             AnimatedOpacity(
@@ -424,4 +383,56 @@ class _YoutubePlayerState extends State<YoutubePlayer> {
           errorBuilder: (context, _, __) => Container(),
         ),
       );
+}
+
+class _ErrorWidget extends StatelessWidget {
+  final YoutubePlayerController controller;
+
+  const _ErrorWidget({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.black87,
+      padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.error_outline,
+                color: Colors.white,
+              ),
+              const SizedBox(width: 5.0),
+              Expanded(
+                child: Text(
+                  errorString(
+                    controller.value.errorCode,
+                    videoId: controller.metadata.videoId.isNotEmpty
+                        ? controller.metadata.videoId
+                        : controller.initialVideoId,
+                  ),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w300,
+                    fontSize: 15.0,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16.0),
+          Text(
+            'Error Code: ${controller.value.errorCode}',
+            style: const TextStyle(
+              color: Colors.grey,
+              fontWeight: FontWeight.w300,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

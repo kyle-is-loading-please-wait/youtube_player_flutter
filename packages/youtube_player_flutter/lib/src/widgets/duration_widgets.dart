@@ -53,9 +53,7 @@ class _CurrentPositionState extends State<CurrentPosition> {
   @override
   Widget build(BuildContext context) {
     return Text(
-      durationFormatter(
-        _controller.value.position.inMilliseconds,
-      ),
+      durationFormatterFromController(_controller),
       style: const TextStyle(
         color: Colors.white,
         fontSize: 12.0,
@@ -109,11 +107,9 @@ class _RemainingDurationState extends State<RemainingDuration> {
 
   @override
   Widget build(BuildContext context) {
+    final formattedDurationText = durationFormatterFromController(_controller);
     return Text(
-      "- ${durationFormatter(
-        (_controller.metadata.duration.inMilliseconds) -
-            (_controller.value.position.inMilliseconds),
-      )}",
+      "- $formattedDurationText",
       style: const TextStyle(
         color: Colors.white,
         fontSize: 12.0,

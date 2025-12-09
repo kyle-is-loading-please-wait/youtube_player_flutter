@@ -17,10 +17,13 @@ class RawYoutubePlayer extends StatefulWidget {
   const RawYoutubePlayer({
     super.key,
     this.onEnded,
+    this.isLive = false,
   });
 
   /// {@macro youtube_player_flutter.onEnded}
   final void Function(YoutubeMetaData metaData)? onEnded;
+
+  final bool isLive;
 
   @override
   State<RawYoutubePlayer> createState() => _RawYoutubePlayerState();
@@ -198,7 +201,8 @@ class _RawYoutubePlayerState extends State<RawYoutubePlayer>
               callback: (args) {
                 controller!.updateValue(
                   controller!.value.copyWith(
-                      metaData: YoutubeMetaData.fromRawData(args.first)),
+                      metaData: YoutubeMetaData.fromRawData(args.first,
+                          isLive: controller?.flags.isLive ?? false)),
                 );
               },
             )

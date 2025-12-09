@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 import '../utils/youtube_player_controller.dart';
@@ -35,6 +33,7 @@ class LiveBottomBar extends StatefulWidget {
 
 class _LiveBottomBarState extends State<LiveBottomBar> {
   double _currentSliderPosition = 0.0;
+  late int minMs;
 
   late YoutubePlayerController _controller;
 
@@ -44,9 +43,9 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
     final controller = YoutubePlayerController.of(context);
     if (controller == null) {
       assert(
-        widget.controller != null,
-        '\n\nNo controller could be found in the provided context.\n\n'
-        'Try passing the controller explicitly.',
+      widget.controller != null,
+      '\n\nNo controller could be found in the provided context.\n\n'
+          'Try passing the controller explicitly.',
       );
       _controller = widget.controller!;
     } else {
@@ -63,11 +62,18 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
 
   void listener() {
     if (mounted) {
-      final double newPosition =
-          _controller.metadata.duration.inMilliseconds == 0
-              ? 0
-              : _controller.value.position.inMilliseconds /
-                  _controller.metadata.duration.inMilliseconds;
+      final durationMs = _controller.metadata.totalVideoLengthMs;
+      final selectedPosition = _controller.value.position.inMilliseconds;
+      final offset = durationMs -
+          _controller.value.metaData.duration.inMilliseconds;
+
+      final newPositionMs = offset +
+          (durationMs - selectedPosition);
+
+      final double newPosition = durationMs == 0 || newPositionMs < 0
+          ? 0
+          : newPositionMs / durationMs;
+      final f = newPosition + 1;
       setState(() {
         _currentSliderPosition = newPosition > 1 ? 1 : newPosition;
       });
@@ -91,11 +97,22 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
               child: Slider(
                 value: _currentSliderPosition,
                 onChanged: (value) {
+                  final durationMs =
+                      _controller.metadata.totalVideoLengthMs;
+                  final vidLengthMs = _controller.metadata.duration
+                      .inMilliseconds;
+                  final minMs = durationMs - vidLengthMs;
+
+                  final selectedPosition = (vidLengthMs * value).round() + minMs;
+                  final newPosition = selectedPosition > durationMs
+                      ? durationMs
+                      : selectedPosition;
+
+                  final time = DateTime.now().subtract(Duration(milliseconds: newPosition));
+
                   _controller.seekTo(
                     Duration(
-                      milliseconds:
-                          (_controller.metadata.duration.inMilliseconds * value)
-                              .round(),
+                      milliseconds: newPosition,
                     ),
                   );
                 },
