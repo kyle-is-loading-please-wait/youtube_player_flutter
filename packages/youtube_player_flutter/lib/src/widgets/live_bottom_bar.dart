@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../utils/youtube_player_controller.dart';
@@ -33,9 +35,8 @@ class LiveBottomBar extends StatefulWidget {
 
 class _LiveBottomBarState extends State<LiveBottomBar> {
   double _currentSliderPosition = 0.0;
-  late int minMs;
-
   late YoutubePlayerController _controller;
+
 
   @override
   void didChangeDependencies() {
@@ -95,14 +96,13 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
               child: Slider(
                 value: _currentSliderPosition,
                 onChanged: (value) {
-                  final durationMs =
-                      _controller.metadata.totalVideoLengthMs;
-                  final vidLengthMs = _controller.metadata.duration
-                      .inMilliseconds;
+                  final durationMs = _controller.metadata.totalVideoLengthMs;
+                  final vidLengthMs =
+                      _controller.metadata.duration.inMilliseconds;
                   final minMs = durationMs - vidLengthMs;
 
-                  final selectedPosition = (vidLengthMs * value).round() +
-                      minMs;
+                  final selectedPosition =
+                      (vidLengthMs * value).round() + minMs;
                   final newPosition = selectedPosition > durationMs
                       ? durationMs
                       : selectedPosition;
@@ -119,7 +119,9 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
             ),
           ),
           InkWell(
-            onTap: () => _controller.seekTo(_controller.metadata.duration),
+            onTap: () =>
+                _controller.seekTo(Duration(
+                    milliseconds: _controller.metadata.totalVideoLengthMs)),
             child: Material(
               color: widget.liveUIColor,
               child: const Text(

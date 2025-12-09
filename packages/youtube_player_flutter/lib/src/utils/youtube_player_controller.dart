@@ -309,7 +309,7 @@ class YoutubePlayerController extends ValueNotifier<YoutubePlayerValue> {
           isLoaded: false,
           isPlaying: false,
           isDragging: false,
-          metaData: const YoutubeMetaData(),
+          metaData: YoutubeMetaData(startedTime: DateTime.now()),
         ),
       );
 

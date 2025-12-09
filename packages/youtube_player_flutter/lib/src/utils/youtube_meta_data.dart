@@ -17,26 +17,29 @@ class YoutubeMetaData {
 
   final int totalVideoLengthMs;
 
+  final DateTime? startedTime;
+
   /// Creates [YoutubeMetaData] for Youtube Video.
-  const YoutubeMetaData({
-    this.videoId = '',
-    this.title = '',
-    this.author = '',
-    this.duration = const Duration(),
-    this.totalVideoLengthMs = 0
-  });
+  const YoutubeMetaData(
+      {this.videoId = '',
+      this.title = '',
+      this.author = '',
+      this.duration = const Duration(),
+      this.totalVideoLengthMs = 0,
+      this.startedTime});
 
   /// Creates [YoutubeMetaData] from raw json video data.
   factory YoutubeMetaData.fromRawData(dynamic rawData, {bool isLive = false}) {
     final data = rawData as Map<String, dynamic>;
-    final int totalLength = (((data['duration'] ?? 0).toDouble() * 1000).floor());
+    final int totalLength =
+        (((data['duration'] ?? 0).toDouble() * 1000).floor());
 
     return YoutubeMetaData(
       videoId: data['videoId'],
       title: data['title'],
       author: data['author'],
-      duration: Duration(milliseconds: isLive
-          ? _maxDurationMs : totalLength),
+      duration: Duration(milliseconds: isLive ? _maxDurationMs : totalLength),
+      startedTime: DateTime.now(),
       totalVideoLengthMs: totalLength,
     );
   }
