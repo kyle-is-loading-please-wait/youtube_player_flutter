@@ -62,15 +62,14 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
 
   void listener() {
     if (mounted) {
-      final durationMs = _controller.metadata.totalVideoLengthMs;
-      final selectedPosition = _controller.value.position.inMilliseconds;
-      final offset = durationMs -
-          _controller.value.metaData.duration.inMilliseconds;
+      final totalTimeMs = _controller.metadata.totalVideoLengthMs;
+      final selectedTimeMs = _controller.value.position.inMilliseconds;
+      final durationMs = _controller.value.metaData.duration.inMilliseconds;
 
-      final newPositionMs = offset +
-          (durationMs - selectedPosition);
+      final minimumTimeMs = totalTimeMs - durationMs;
+      final newPositionMs = selectedTimeMs - minimumTimeMs;
 
-      final double newPosition = durationMs == 0 || newPositionMs < 0
+      final double newPosition = totalTimeMs == 0 || newPositionMs < 0
           ? 0
           : newPositionMs / durationMs;
       final f = newPosition + 1;
@@ -103,12 +102,14 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
                       .inMilliseconds;
                   final minMs = durationMs - vidLengthMs;
 
-                  final selectedPosition = (vidLengthMs * value).round() + minMs;
+                  final selectedPosition = (vidLengthMs * value).round() +
+                      minMs;
                   final newPosition = selectedPosition > durationMs
                       ? durationMs
                       : selectedPosition;
 
-                  final time = DateTime.now().subtract(Duration(milliseconds: newPosition));
+                  final time = DateTime.now().subtract(
+                      Duration(milliseconds: newPosition));
 
                   _controller.seekTo(
                     Duration(
