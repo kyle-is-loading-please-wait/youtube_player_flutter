@@ -12,14 +12,12 @@ class CurrentPosition extends StatefulWidget {
   /// Overrides the default [YoutubePlayerController].
   final YoutubePlayerController? controller;
   final int? selectedTimeMs;
-  final bool displayBorder;
 
   /// Creates [CurrentPosition] widget.
   const CurrentPosition({
     super.key,
     this.controller,
     this.selectedTimeMs = 0,
-    this.displayBorder = false,
   });
 
   @override
@@ -35,9 +33,9 @@ class _CurrentPositionState extends State<CurrentPosition> {
     final controller = YoutubePlayerController.of(context);
     if (controller == null) {
       assert(
-      widget.controller != null,
-      '\n\nNo controller could be found in the provided context.\n\n'
-          'Try passing the controller explicitly.',
+        widget.controller != null,
+        '\n\nNo controller could be found in the provided context.\n\n'
+        'Try passing the controller explicitly.',
       );
       _controller = widget.controller!;
     } else {
@@ -59,22 +57,24 @@ class _CurrentPositionState extends State<CurrentPosition> {
 
   @override
   Widget build(BuildContext context) {
+    final flags = _controller.flags;
+    final decoration = flags.timeDecoration;
+
     final timeDisplay = durationFormatterFromController(
       _controller,
       selectedTimeMs: widget.selectedTimeMs,
     );
     final textWidget = Text(
       ' $timeDisplay ',
-      style: const TextStyle(
-        color: Colors.black,
+      style: TextStyle(
+        color: flags.timeTextColor,
         fontSize: 12.0,
       ),
     );
-    if (!widget.displayBorder) {
+    if (decoration == null) {
       return textWidget;
     }
-    return Material(color: Colors.white,
-        child: textWidget);
+    return DecoratedBox(decoration: decoration, child: textWidget);
   }
 }
 
@@ -85,11 +85,8 @@ class RemainingDuration extends StatefulWidget {
     super.key,
     this.controller,
     this.selectedTimeMs,
-    this.displayBorder = false,
-
   });
 
-  final bool displayBorder;
   final int? selectedTimeMs;
 
   /// Overrides the default [YoutubePlayerController].
@@ -108,9 +105,9 @@ class _RemainingDurationState extends State<RemainingDuration> {
     final controller = YoutubePlayerController.of(context);
     if (controller == null) {
       assert(
-      widget.controller != null,
-      '\n\nNo controller could be found in the provided context.\n\n'
-          'Try passing the controller explicitly.',
+        widget.controller != null,
+        '\n\nNo controller could be found in the provided context.\n\n'
+        'Try passing the controller explicitly.',
       );
       _controller = widget.controller!;
     } else {
@@ -132,21 +129,23 @@ class _RemainingDurationState extends State<RemainingDuration> {
 
   @override
   Widget build(BuildContext context) {
+    final flags = _controller.flags;
+    final decoration = flags.timeDecoration;
+
     final timeDisplay = durationFormatterFromController(
       _controller,
       selectedTimeMs: widget.selectedTimeMs,
     );
     final textWidget = Text(
       ' $timeDisplay ',
-      style: const TextStyle(
-        color: Colors.black,
+      style: TextStyle(
+        color: flags.timeTextColor,
         fontSize: 12.0,
       ),
     );
-    if (!widget.displayBorder) {
+    if (decoration == null) {
       return textWidget;
     }
-    return Material(color: Colors.white,
-        child: textWidget);
+    return DecoratedBox(decoration: decoration, child: textWidget);
   }
 }

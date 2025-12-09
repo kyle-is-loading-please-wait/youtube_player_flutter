@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:flutter/material.dart';
+
 /// Defines player flags for [YoutubePlayer].
 class YoutubePlayerFlags {
   /// If set to true, hides the controls.
@@ -79,6 +81,14 @@ class YoutubePlayerFlags {
   /// Default is true.
   final bool showLiveFullscreenButton;
 
+  /// Defines the decoration to display around the time remaining / current time widget
+  final Decoration? timeDecoration;
+
+  /// Defines the text color for the time remaining / current time widget
+  ///
+  /// Default is white
+  final Color timeTextColor;
+
   /// Creates [YoutubePlayerFlags].
   const YoutubePlayerFlags({
     this.hideControls = false,
@@ -96,6 +106,8 @@ class YoutubePlayerFlags {
     this.endAt,
     this.useHybridComposition = true,
     this.showLiveFullscreenButton = true,
+    this.timeDecoration,
+    this.timeTextColor = Colors.white,
   });
 
   /// Copies new values assigned to the [YoutubePlayerFlags].
