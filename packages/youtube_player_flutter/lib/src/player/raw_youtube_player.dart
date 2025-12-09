@@ -201,8 +201,7 @@ class _RawYoutubePlayerState extends State<RawYoutubePlayer>
               callback: (args) {
                 controller!.updateValue(
                   controller!.value.copyWith(
-                      metaData: YoutubeMetaData.fromRawData(args.first,
-                          isLive: controller?.flags.isLive ?? false)),
+                      metaData: YoutubeMetaData.fromRawData(args.first)),
                 );
               },
             )
@@ -304,7 +303,8 @@ class _RawYoutubePlayerState extends State<RawYoutubePlayer>
                     'duration': player.getDuration(),
                     'title': player.getVideoData().title,
                     'author': player.getVideoData().author,
-                    'videoId': player.getVideoData().video_id
+                    'videoId': player.getVideoData().video_id,
+                    'isLive': player.getIsLive()
                 };
                 window.flutter_inappwebview.callHandler('VideoData', videoData);
             }

@@ -30,10 +30,12 @@ class YoutubeMetaData {
   });
 
   /// Creates [YoutubeMetaData] from raw json video data.
-  factory YoutubeMetaData.fromRawData(dynamic rawData, {bool isLive = false}) {
+  factory YoutubeMetaData.fromRawData(dynamic rawData) {
     final data = rawData as Map<String, dynamic>;
     final int totalLength =
         (((data['duration'] ?? 0).toDouble() * 1000).floor());
+
+    final bool isLive = data['isLive'] ?? false;
 
     //Calculate duration based on live stream or prerecorded video
     //Live streams can only be 12hr max
