@@ -34,6 +34,7 @@ class LiveBottomBar extends StatefulWidget {
 class _LiveBottomBarState extends State<LiveBottomBar> {
   double _currentSliderPosition = 0.0;
   late YoutubePlayerController _controller;
+  bool init = false;
   int selectedTimeMs = 0;
 
   @override
@@ -42,9 +43,9 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
     final controller = YoutubePlayerController.of(context);
     if (controller == null) {
       assert(
-        widget.controller != null,
-        '\n\nNo controller could be found in the provided context.\n\n'
-        'Try passing the controller explicitly.',
+      widget.controller != null,
+      '\n\nNo controller could be found in the provided context.\n\n'
+          'Try passing the controller explicitly.',
       );
       _controller = widget.controller!;
     } else {
@@ -62,7 +63,7 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
   void listener() {
     if (mounted) {
       final totalTimeMs = _controller.metadata.totalVideoLengthMs;
-      final selectedTimeMs = _controller.value.position.inMilliseconds;
+
       final durationMs = _controller.value.metaData.duration.inMilliseconds;
 
       final minimumTimeMs = totalTimeMs - durationMs;
@@ -71,7 +72,12 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
       final double newPosition = totalTimeMs == 0 || newPositionMs < 0
           ? 0
           : newPositionMs / durationMs;
+
       setState(() {
+        if(!init && totalTimeMs > 0){
+          selectedTimeMs = totalTimeMs;
+          init = true;
+        }
         _currentSliderPosition = newPosition > 1 ? 1 : newPosition;
       });
     }
@@ -79,6 +85,25 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
 
   @override
   Widget build(BuildContext context) {
+    final isLive = selectedTimeMs == _controller.metadata.totalVideoLengthMs;
+    final liveButton = isLive ? Container() : InkWell(
+      onTap: () {
+        _controller.seekTo(Duration(
+            milliseconds: _controller.metadata.totalVideoLengthMs));
+        selectedTimeMs = _controller.value.position.inMilliseconds;
+      },
+      child: Material(
+        color: widget.liveUIColor,
+        child: const Text(
+          ' LIVE ',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 12.0,
+            fontWeight: FontWeight.w300,
+          ),
+        ),
+      ),
+    );
     return Visibility(
       visible: _controller.value.isControlsVisible,
       child: Row(
@@ -87,7 +112,7 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
           const SizedBox(
             width: 14.0,
           ),
-          CurrentPosition( selectedTimeMs: selectedTimeMs),
+          CurrentPosition(selectedTimeMs: selectedTimeMs),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -111,36 +136,19 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
                     ),
                   );
                   selectedTimeMs = _controller.value.position.inMilliseconds;
-
                 },
                 activeColor: widget.liveUIColor,
                 inactiveColor: Colors.transparent,
               ),
             ),
           ),
-          InkWell(
-            onTap: () {
-              _controller.seekTo(Duration(
-                  milliseconds: _controller.metadata.totalVideoLengthMs));
-              selectedTimeMs = _controller.value.position.inMilliseconds;
-            },
-            child: Material(
-              color: widget.liveUIColor,
-              child: const Text(
-                ' LIVE ',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12.0,
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
-            ),
-          ),
+          liveButton,
           widget.showLiveFullscreenButton
-              ? FullScreenButton(controller: _controller)
-              : const SizedBox(width: 14.0),
+              ? FullScreenButton(controller:
+          _controller) : const SizedBox(width: 14.0),
         ],
-      ),
+      )
+      ,
     );
   }
 }

@@ -47,6 +47,9 @@ String durationFormatterFromController(YoutubePlayerController controller,
   final offset = position - totalTimeSeconds;
 
   final diff = duration - offset;
+  final sign = (diff > 0 && isLive) ? '-' : '';
 
-  return durationFormatter(diff, controller.flags.isLive);
+  final timeDisplay = durationFormatter(diff, controller.flags.isLive);
+
+  return '$sign$timeDisplay';
 }
