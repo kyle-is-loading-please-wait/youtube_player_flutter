@@ -9,7 +9,7 @@ import '../utils/errors.dart';
 import '../utils/youtube_meta_data.dart';
 import '../utils/youtube_player_controller.dart';
 import '../utils/youtube_player_flags.dart';
-import '../widgets/bottom_bar_recording.dart';
+import '../widgets/bottom_bar/bottom_bar_recording.dart';
 import '../widgets/widgets.dart';
 import 'raw_youtube_player.dart';
 

@@ -1,5 +1,5 @@
 //Maximum length of youtube live video in ms (12hr)
-const int maxDurationMs = 43200000;
+const int _maxDurationMs = 43200000;
 
 /// Meta data for Youtube Video.
 class YoutubeMetaData {
@@ -42,7 +42,7 @@ class YoutubeMetaData {
     //If a livestream is less than 12hr long, use the actual duration of the livestream
     late final int duration;
     if (isLive) {
-      duration = totalLength < maxDurationMs ? totalLength : maxDurationMs;
+      duration = totalLength < _maxDurationMs ? totalLength : _maxDurationMs;
     } else {
       duration = totalLength;
     }

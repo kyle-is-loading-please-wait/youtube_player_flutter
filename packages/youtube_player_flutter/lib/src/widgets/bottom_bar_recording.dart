@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../youtube_player_flutter.dart';
+import '../../../youtube_player_flutter.dart';
 
+/// This widget is used for displaying progress bar on recordings (i.e. non-live videos)
 class BottomBarRecording extends StatelessWidget {
   const BottomBarRecording(
       {super.key,
