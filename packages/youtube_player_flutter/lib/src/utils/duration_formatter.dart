@@ -14,42 +14,39 @@ String durationFormatter(int milliseconds, bool isLive) {
   final hoursString = hours >= 10
       ? '$hours'
       : hours == 0
-      ? '00'
-      : '0$hours';
+          ? '00'
+          : '0$hours';
   final minutesString = minutes >= 10
       ? '$minutes'
       : minutes == 0
-      ? '00'
-      : '0$minutes';
+          ? '00'
+          : '0$minutes';
   final secondsString = seconds >= 10
       ? '$seconds'
       : seconds == 0
-      ? '00'
-      : '0$seconds';
+          ? '00'
+          : '0$seconds';
   final formattedTime =
-      '${hoursString == '00'
-      ? ''
-      : '$hoursString:'}$minutesString:$secondsString';
+      '${hoursString == '00' ? '' : '$hoursString:'}$minutesString:$secondsString';
+  if (isLive) {
+    return '-$formattedTime';
+  }
+
   return formattedTime;
 }
 
 String durationFormatterFromController(YoutubePlayerController controller,
     {int? selectedTimeMs}) {
   final isLive = controller.flags.isLive;
-  final duration = controller.metadata.duration.inSeconds;
+  final duration = controller.metadata.duration.inMilliseconds;
   final position = selectedTimeMs ?? controller.value.position.inMilliseconds;
-  final totalTimeSeconds = controller.metadata.totalVideoLengthMs;
+  final videoLengthMs = controller.metadata.totalVideoLengthMs;
 
-  if (isLive && position == totalTimeSeconds) {
+  if (isLive && position == videoLengthMs) {
     return 'Live';
   }
 
-  final offset = position - totalTimeSeconds;
+  final offset = videoLengthMs - position;
 
-  final diff = duration - offset;
-  final sign = (diff > 0 && isLive) ? '-' : '';
-
-  final timeDisplay = durationFormatter(diff, controller.flags.isLive);
-
-  return '$sign$timeDisplay';
+  return durationFormatter(offset, controller.flags.isLive);
 }

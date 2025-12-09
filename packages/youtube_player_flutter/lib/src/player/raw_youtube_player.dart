@@ -301,7 +301,7 @@ class _RawYoutubePlayerState extends State<RawYoutubePlayer>
                     'title': player.getVideoData().title,
                     'author': player.getVideoData().author,
                     'videoId': player.getVideoData().video_id,
-                    'isLive': player.getVideoData().is_live
+                    'isLive': player.getVideoData().isLive
                 };
                 window.flutter_inappwebview.callHandler('VideoData', videoData);
             }
