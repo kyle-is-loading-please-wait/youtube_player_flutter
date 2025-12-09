@@ -11,9 +11,14 @@ import '../utils/youtube_player_controller.dart';
 class CurrentPosition extends StatefulWidget {
   /// Overrides the default [YoutubePlayerController].
   final YoutubePlayerController? controller;
+  final int? selectedTimeMs;
 
   /// Creates [CurrentPosition] widget.
-  const CurrentPosition({super.key, this.controller});
+  const CurrentPosition({
+    super.key,
+    this.controller,
+    this.selectedTimeMs = 0,
+  });
 
   @override
   State<CurrentPosition> createState() => _CurrentPositionState();
@@ -53,7 +58,10 @@ class _CurrentPositionState extends State<CurrentPosition> {
   @override
   Widget build(BuildContext context) {
     return Text(
-      durationFormatterFromController(_controller),
+      durationFormatterFromController(
+        _controller,
+        selectedTimeMs: widget.selectedTimeMs,
+      ),
       style: const TextStyle(
         color: Colors.white,
         fontSize: 12.0,
@@ -65,7 +73,13 @@ class _CurrentPositionState extends State<CurrentPosition> {
 /// A widget which displays the remaining duration of the video.
 class RemainingDuration extends StatefulWidget {
   /// Creates [RemainingDuration] widget.
-  const RemainingDuration({super.key, this.controller});
+  const RemainingDuration({
+    super.key,
+    this.controller,
+    this.selectedTimeMs,
+  });
+
+  final int? selectedTimeMs;
 
   /// Overrides the default [YoutubePlayerController].
   final YoutubePlayerController? controller;
@@ -107,7 +121,10 @@ class _RemainingDurationState extends State<RemainingDuration> {
 
   @override
   Widget build(BuildContext context) {
-    final formattedDurationText = durationFormatterFromController(_controller);
+    final formattedDurationText = durationFormatterFromController(
+      _controller,
+      selectedTimeMs: widget.selectedTimeMs,
+    );
     return Text(
       "- $formattedDurationText",
       style: const TextStyle(

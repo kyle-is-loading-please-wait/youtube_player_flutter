@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../utils/duration_formatter.dart';
@@ -44,7 +42,6 @@ class _TouchShutterState extends State<TouchShutter> {
   String seekDuration = "";
   String seekPosition = "";
   bool _dragging = false;
-  Timer? _timer;
 
   late YoutubePlayerController _controller;
 
@@ -66,7 +63,6 @@ class _TouchShutterState extends State<TouchShutter> {
 
   @override
   void dispose() {
-    _timer?.cancel();
     super.dispose();
   }
 
@@ -76,16 +72,6 @@ class _TouchShutterState extends State<TouchShutter> {
         isControlsVisible: !_controller.value.isControlsVisible,
       ),
     );
-    _timer?.cancel();
-    _timer = Timer(widget.timeOut, () {
-      if (!_controller.value.isDragging) {
-        _controller.updateValue(
-          _controller.value.copyWith(
-            isControlsVisible: false,
-          ),
-        );
-      }
-    });
   }
 
   @override

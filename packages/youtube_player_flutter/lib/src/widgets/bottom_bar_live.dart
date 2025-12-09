@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../utils/youtube_player_controller.dart';
@@ -36,7 +34,7 @@ class LiveBottomBar extends StatefulWidget {
 class _LiveBottomBarState extends State<LiveBottomBar> {
   double _currentSliderPosition = 0.0;
   late YoutubePlayerController _controller;
-
+  int selectedTimeMs = 0;
 
   @override
   void didChangeDependencies() {
@@ -44,9 +42,9 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
     final controller = YoutubePlayerController.of(context);
     if (controller == null) {
       assert(
-      widget.controller != null,
-      '\n\nNo controller could be found in the provided context.\n\n'
-          'Try passing the controller explicitly.',
+        widget.controller != null,
+        '\n\nNo controller could be found in the provided context.\n\n'
+        'Try passing the controller explicitly.',
       );
       _controller = widget.controller!;
     } else {
@@ -89,7 +87,7 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
           const SizedBox(
             width: 14.0,
           ),
-          const CurrentPosition(),
+          CurrentPosition( selectedTimeMs: selectedTimeMs),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -112,6 +110,8 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
                       milliseconds: newPosition,
                     ),
                   );
+                  selectedTimeMs = _controller.value.position.inMilliseconds;
+
                 },
                 activeColor: widget.liveUIColor,
                 inactiveColor: Colors.transparent,
@@ -119,9 +119,11 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
             ),
           ),
           InkWell(
-            onTap: () =>
-                _controller.seekTo(Duration(
-                    milliseconds: _controller.metadata.totalVideoLengthMs)),
+            onTap: () {
+              _controller.seekTo(Duration(
+                  milliseconds: _controller.metadata.totalVideoLengthMs));
+              selectedTimeMs = _controller.value.position.inMilliseconds;
+            },
             child: Material(
               color: widget.liveUIColor,
               child: const Text(

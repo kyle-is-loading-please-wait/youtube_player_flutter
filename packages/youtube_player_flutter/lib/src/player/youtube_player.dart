@@ -9,6 +9,7 @@ import '../utils/errors.dart';
 import '../utils/youtube_meta_data.dart';
 import '../utils/youtube_player_controller.dart';
 import '../utils/youtube_player_flags.dart';
+import '../widgets/bottom_bar_recording.dart';
 import '../widgets/widgets.dart';
 import 'raw_youtube_player.dart';
 
@@ -230,7 +231,6 @@ class _YoutubePlayerState extends State<YoutubePlayer> {
 
   @override
   Widget build(BuildContext context) {
-    final isLive = controller.flags.isLive;
     return Material(
       elevation: 0,
       color: Colors.black,
@@ -247,6 +247,24 @@ class _YoutubePlayerState extends State<YoutubePlayer> {
   }
 
   Widget _buildPlayer({required Widget errorWidget, bool isLive = false}) {
+    final bottomBar = AnimatedOpacity(
+      opacity:
+          !controller.flags.hideControls && controller.value.isControlsVisible
+              ? 1
+              : 0,
+      duration: const Duration(milliseconds: 300),
+      child: controller.flags.isLive
+          ? LiveBottomBar(
+              liveUIColor: widget.liveUIColor,
+              showLiveFullscreenButton:
+                  widget.controller.flags.showLiveFullscreenButton,
+            )
+          : BottomBarRecording(
+              actionsPadding: widget.actionsPadding,
+              progressColors: widget.progressColors,
+              bottomActions: widget.bottomActions,
+            ),
+    );
     return AspectRatio(
       aspectRatio: _aspectRatio,
       child: Stack(
@@ -300,39 +318,7 @@ class _YoutubePlayerState extends State<YoutubePlayer> {
               bottom: 0,
               left: 0,
               right: 0,
-              child: AnimatedOpacity(
-                opacity: !controller.flags.hideControls &&
-                        controller.value.isControlsVisible
-                    ? 1
-                    : 0,
-                duration: const Duration(milliseconds: 300),
-                child: controller.flags.isLive
-                    ? LiveBottomBar(
-                        liveUIColor: widget.liveUIColor,
-                        showLiveFullscreenButton:
-                            widget.controller.flags.showLiveFullscreenButton,
-                      )
-                    : Padding(
-                        padding: widget.bottomActions == null
-                            ? const EdgeInsets.all(0.0)
-                            : widget.actionsPadding,
-                        child: Row(
-                          children: widget.bottomActions ??
-                              [
-                                const SizedBox(width: 14.0),
-                                const CurrentPosition(),
-                                const SizedBox(width: 8.0),
-                                ProgressBar(
-                                  isExpanded: true,
-                                  colors: widget.progressColors,
-                                ),
-                                const RemainingDuration(),
-                                const PlaybackSpeedButton(),
-                                const FullScreenButton(),
-                              ],
-                        ),
-                      ),
-              ),
+              child: bottomBar,
             ),
             Positioned(
               top: 0,

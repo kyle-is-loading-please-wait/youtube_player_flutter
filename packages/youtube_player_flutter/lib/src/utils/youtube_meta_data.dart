@@ -1,4 +1,5 @@
 //Milliseconds prior max for live YouTube video
+
 const int _maxDurationMs = 43200000;
 
 /// Meta data for Youtube Video.
@@ -15,18 +16,19 @@ class YoutubeMetaData {
   /// Total duration of the currently loaded video.
   final Duration duration;
 
+  /// The actual total ms length of video
+  /// Livestreams can be many hundreds of hours long, but can only be
+  /// rewound a total of 12hr at max
   final int totalVideoLengthMs;
 
-  final DateTime? startedTime;
-
   /// Creates [YoutubeMetaData] for Youtube Video.
-  const YoutubeMetaData(
-      {this.videoId = '',
-      this.title = '',
-      this.author = '',
-      this.duration = const Duration(),
-      this.totalVideoLengthMs = 0,
-      this.startedTime});
+  const YoutubeMetaData({
+    this.videoId = '',
+    this.title = '',
+    this.author = '',
+    this.duration = const Duration(),
+    this.totalVideoLengthMs = 0,
+  });
 
   /// Creates [YoutubeMetaData] from raw json video data.
   factory YoutubeMetaData.fromRawData(dynamic rawData, {bool isLive = false}) {
@@ -34,12 +36,21 @@ class YoutubeMetaData {
     final int totalLength =
         (((data['duration'] ?? 0).toDouble() * 1000).floor());
 
+    //Calculate duration based on live stream or prerecorded video
+    //Live streams can only be 12hr max
+    //If a livestream is less than 12hr long, use the actual duration of the livestream
+    late final int duration;
+    if (isLive) {
+      duration = totalLength < _maxDurationMs ? totalLength : _maxDurationMs;
+    } else {
+      duration = totalLength;
+    }
+
     return YoutubeMetaData(
       videoId: data['videoId'],
       title: data['title'],
       author: data['author'],
-      duration: Duration(milliseconds: isLive ? _maxDurationMs : totalLength),
-      startedTime: DateTime.now(),
+      duration: Duration(milliseconds: duration),
       totalVideoLengthMs: totalLength,
     );
   }
@@ -50,6 +61,7 @@ class YoutubeMetaData {
         'videoId: $videoId, '
         'title: $title, '
         'author: $author, '
-        'duration: ${duration.inSeconds} sec.)';
+        'duration: ${duration.inSeconds} sec.,'
+        'totalVideoLengthMs: $totalVideoLengthMs}';
   }
 }
