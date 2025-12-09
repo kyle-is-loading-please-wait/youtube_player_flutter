@@ -17,13 +17,10 @@ class RawYoutubePlayer extends StatefulWidget {
   const RawYoutubePlayer({
     super.key,
     this.onEnded,
-    this.isLive = false,
   });
 
   /// {@macro youtube_player_flutter.onEnded}
   final void Function(YoutubeMetaData metaData)? onEnded;
-
-  final bool isLive;
 
   @override
   State<RawYoutubePlayer> createState() => _RawYoutubePlayerState();
@@ -304,7 +301,7 @@ class _RawYoutubePlayerState extends State<RawYoutubePlayer>
                     'title': player.getVideoData().title,
                     'author': player.getVideoData().author,
                     'videoId': player.getVideoData().video_id,
-                    'isLive': player.getIsLive()
+                    'isLive': player.getVideoData().is_live
                 };
                 window.flutter_inappwebview.callHandler('VideoData', videoData);
             }

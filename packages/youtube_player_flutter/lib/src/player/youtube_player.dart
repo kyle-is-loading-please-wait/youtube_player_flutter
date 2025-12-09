@@ -246,7 +246,7 @@ class _YoutubePlayerState extends State<YoutubePlayer> {
     );
   }
 
-  Widget _buildPlayer({required Widget errorWidget, bool isLive = false}) {
+  Widget _buildPlayer({required Widget errorWidget}) {
     final bottomBar = AnimatedOpacity(
       opacity:
           !controller.flags.hideControls && controller.value.isControlsVisible
@@ -282,7 +282,6 @@ class _YoutubePlayerState extends State<YoutubePlayer> {
 
               widget.onEnded?.call(metaData);
             },
-            isLive: isLive,
           ),
           if (!controller.flags.hideThumbnail)
             AnimatedOpacity(
