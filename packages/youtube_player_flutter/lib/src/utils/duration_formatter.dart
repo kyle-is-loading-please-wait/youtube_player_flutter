@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:youtube_player_flutter/src/utils/live_duration_calculator.dart.bak';
+import 'package:youtube_player_flutter/src/utils/live_duration_calculator.dart';
 import 'package:youtube_player_flutter/src/utils/youtube_player_controller.dart';
 
 /// Formats duration in milliseconds to xx:xx:xx format.
