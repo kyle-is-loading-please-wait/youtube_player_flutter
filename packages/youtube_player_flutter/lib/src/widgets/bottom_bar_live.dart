@@ -36,8 +36,9 @@ class LiveBottomBar extends StatefulWidget {
 class _LiveBottomBarState extends State<LiveBottomBar> {
   double _currentSliderPosition = 0.0;
   late YoutubePlayerController _controller;
-  bool init = false;
-  int selectedTimeMs = 0;
+
+  bool _init = false;
+  int _selectedTimeMs = 0;
 
   @override
   void didChangeDependencies() {
@@ -66,7 +67,7 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
     if (mounted) {
       setState(() {
         final liveDurationTimes = LiveDurationCalculator.getDuration(
-            controller: _controller, selectedTimeMs: selectedTimeMs);
+            controller: _controller, selectedTimeMs: _selectedTimeMs);
 
         final totalTimeMs = liveDurationTimes.totalVideoTimeMs;
         final durationMs = liveDurationTimes.videoDurationMs;
@@ -83,9 +84,9 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
         //the max time (i.e. setting it to "Live")
         //_controller is not ready in the didChangeState or initState overrides,
         //so need to do here
-        if (!init && totalTimeMs > 0) {
-          selectedTimeMs = totalTimeMs;
-          init = true;
+        if (!_init && totalTimeMs > 0) {
+          _selectedTimeMs = totalTimeMs;
+          _init = true;
         }
         _currentSliderPosition = newPosition > 1 ? 1 : newPosition;
       });
@@ -94,6 +95,7 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
 
   @override
   Widget build(BuildContext context) {
+    //Hide the "Live" button if the stream is set to max value on slider
     final isRealtime = _currentSliderPosition == 1;
 
     //To keep consistent spacing, set live button to transparent / disabled
@@ -104,7 +106,7 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
           : () {
               _controller.seekTo(Duration(
                   milliseconds: _controller.metadata.totalVideoLengthMs));
-              selectedTimeMs = _controller.value.position.inMilliseconds;
+              _selectedTimeMs = _controller.value.position.inMilliseconds;
             },
       child: Material(
         color: isRealtime ? Colors.transparent : widget.liveUIColor,
@@ -127,7 +129,7 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
             width: 14.0,
           ),
           CurrentPosition(
-            selectedTimeMs: selectedTimeMs,
+            selectedTimeMs: _selectedTimeMs,
           ),
           Expanded(
             child: Padding(
@@ -151,7 +153,7 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
                       milliseconds: newPosition,
                     ),
                   );
-                  selectedTimeMs = _controller.value.position.inMilliseconds;
+                  _selectedTimeMs = _controller.value.position.inMilliseconds;
                 },
                 activeColor: widget.liveUIColor,
                 inactiveColor: Colors.transparent,
