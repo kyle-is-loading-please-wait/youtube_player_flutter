@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../youtube_player_flutter.dart';
 import '../utils/youtube_player_controller.dart';
 import 'duration_widgets.dart';
 import 'full_screen_button.dart';
@@ -62,9 +63,23 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
 
   void listener() {
     if (mounted) {
-      final totalTimeMs = _controller.metadata.totalVideoLengthMs;
+      //check to see if video is still ongoing stream
+      final isLessThanMaxTime =
+          _controller.metadata.totalVideoLengthMs < maxDurationMs;
+      int timeOffset = 0;
 
-      final durationMs = _controller.value.metaData.duration.inMilliseconds;
+      //offset the length of the video by the difference in the live video start
+      //time and the length of time since then
+      if (!isLessThanMaxTime) {
+        final startTime = _controller.metadata.startTime;
+        assert(startTime != null);
+        timeOffset = DateTime.now().difference(startTime!).inMilliseconds;
+      }
+
+      final int totalTimeMs =
+          _controller.metadata.totalVideoLengthMs + timeOffset;
+      final int durationMs =
+          _controller.value.metaData.duration.inMilliseconds + timeOffset;
 
       final minimumTimeMs = totalTimeMs - durationMs;
       final newPositionMs = selectedTimeMs - minimumTimeMs;

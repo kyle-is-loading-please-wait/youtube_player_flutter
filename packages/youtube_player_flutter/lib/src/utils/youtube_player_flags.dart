@@ -29,6 +29,8 @@ class YoutubePlayerFlags {
   /// if true, Live Playback controls will be shown instead of default one.
   ///
   /// Default is false.
+  @Deprecated('This value is ignored. Metadata from the YouTube API call is '
+      'now used to check if video is live.')
   final bool isLive;
 
   /// Hides thumbnail if true.
@@ -118,6 +120,8 @@ class YoutubePlayerFlags {
     bool? autoPlay,
     bool? mute,
     bool? showVideoProgressIndicator,
+    @Deprecated('This value is ignored. Metadata from the YouTube API call is '
+        'now used to check if video is live.')
     bool? isLive,
     bool? hideThumbnail,
     bool? disableDragSeek,

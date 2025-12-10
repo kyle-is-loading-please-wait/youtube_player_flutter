@@ -20,7 +20,12 @@ class YoutubeMetaData {
   /// rewound a total of 12hr at max
   final int totalVideoLengthMs;
 
+  /// The YouTube API response value for if a video is live
   final bool isLive;
+
+  /// The start time ms since epoch
+  /// Used for live videos which are currently streaming and are less than 12hr long
+  final DateTime? startTime;
 
   /// Creates [YoutubeMetaData] for Youtube Video.
   const YoutubeMetaData({
@@ -30,6 +35,7 @@ class YoutubeMetaData {
     this.duration = const Duration(),
     this.totalVideoLengthMs = 0,
     this.isLive = false,
+    this.startTime,
   });
 
   /// Creates [YoutubeMetaData] from raw json video data.
@@ -50,14 +56,16 @@ class YoutubeMetaData {
       duration = totalLength;
     }
 
+    final startTime = !isLive ? null : DateTime.now();
+
     return YoutubeMetaData(
-      videoId: data['videoId'],
-      title: data['title'],
-      author: data['author'],
-      duration: Duration(milliseconds: duration),
-      totalVideoLengthMs: totalLength,
-      isLive: isLive,
-    );
+        videoId: data['videoId'],
+        title: data['title'],
+        author: data['author'],
+        duration: Duration(milliseconds: duration),
+        totalVideoLengthMs: totalLength,
+        isLive: isLive,
+        startTime: startTime);
   }
 
   @override
@@ -66,7 +74,9 @@ class YoutubeMetaData {
         'videoId: $videoId, '
         'title: $title, '
         'author: $author, '
-        'duration: ${duration.inSeconds} sec.,'
-        'totalVideoLengthMs: $totalVideoLengthMs}';
+        'duration: ${duration.inSeconds} sec., '
+        'totalVideoLengthMs: $totalVideoLengthMs, '
+        'isLive: $isLive'
+        ')';
   }
 }
