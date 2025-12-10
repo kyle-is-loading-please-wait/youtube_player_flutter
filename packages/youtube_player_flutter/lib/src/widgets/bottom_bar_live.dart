@@ -46,9 +46,9 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
     final controller = YoutubePlayerController.of(context);
     if (controller == null) {
       assert(
-        widget.controller != null,
-        '\n\nNo controller could be found in the provided context.\n\n'
-        'Try passing the controller explicitly.',
+      widget.controller != null,
+      '\n\nNo controller could be found in the provided context.\n\n'
+          'Try passing the controller explicitly.',
       );
       _controller = widget.controller!;
     } else {
@@ -104,10 +104,10 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
       onTap: isRealtime
           ? null
           : () {
-              _controller.seekTo(Duration(
-                  milliseconds: _controller.metadata.totalVideoLengthMs));
-              _selectedTimeMs = _controller.value.position.inMilliseconds;
-            },
+        _controller.seekTo(Duration(
+            milliseconds: _controller.metadata.totalVideoLengthMs));
+        _selectedTimeMs = _controller.value.position.inMilliseconds;
+      },
       child: Material(
         color: isRealtime ? Colors.transparent : widget.liveUIColor,
         child: Text(
@@ -137,23 +137,25 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
               child: Slider(
                 value: _currentSliderPosition,
                 onChanged: (value) {
-                  final durationMs = _controller.metadata.totalVideoLengthMs;
-                  final vidLengthMs =
-                      _controller.metadata.duration.inMilliseconds;
+                  final livestreamTimes = LiveDurationCalculator.getDuration(
+                      controller: _controller, selectedTimeMs: _selectedTimeMs);
+                  final durationMs = livestreamTimes.videoDurationMs;
+                  final vidLengthMs = livestreamTimes.totalVideoTimeMs;
                   final minMs = durationMs - vidLengthMs;
 
                   final selectedPosition =
                       (vidLengthMs * value).round() + minMs;
                   final newPosition = selectedPosition > durationMs
-                      ? durationMs
+                      ? maxDurationMs
                       : selectedPosition;
-
                   _controller.seekTo(
                     Duration(
                       milliseconds: newPosition,
                     ),
                   );
-                  _selectedTimeMs = _controller.value.position.inMilliseconds;
+                  setState(() {
+                    _selectedTimeMs = _controller.value.position.inMilliseconds;
+                  });
                 },
                 activeColor: widget.liveUIColor,
                 inactiveColor: Colors.transparent,
