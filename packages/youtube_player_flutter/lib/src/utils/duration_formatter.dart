@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:youtube_player_flutter/src/utils/live_duration_calculator.dart';
+import 'package:youtube_player_flutter/src/utils/live_duration_calculator.dart.bak';
 import 'package:youtube_player_flutter/src/utils/youtube_player_controller.dart';
 
 /// Formats duration in milliseconds to xx:xx:xx format.
@@ -50,9 +50,9 @@ String durationFormatterFromController(YoutubePlayerController controller,
   final offset =
       liveStreamTimes.totalVideoTimeMs - liveStreamTimes.selectedPositionMs;
 
-  if (offset <= 0) {
-    return 'Live';
-  }
+  // if (offset <= 0) {
+  //   return 'Live';
+  // }
 
   return durationFormatter(offset, isLive);
 }

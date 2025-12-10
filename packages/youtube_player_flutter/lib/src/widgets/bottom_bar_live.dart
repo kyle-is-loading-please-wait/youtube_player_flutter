@@ -6,9 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/src/utils/live_duration_calculator.dart';
 
 import '../../youtube_player_flutter.dart';
-import '../utils/youtube_player_controller.dart';
-import 'duration_widgets.dart';
-import 'full_screen_button.dart';
 
 /// This widget is used to display display bottom controls bar on Live Video Mode.
 class LiveBottomBar extends StatefulWidget {
@@ -38,7 +35,7 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
   late YoutubePlayerController _controller;
 
   bool _init = false;
-  int _selectedTimeMs = 0;
+  final _selectedTimeController = ValueNotifier<int>(0);
 
   @override
   void didChangeDependencies() {
@@ -60,34 +57,36 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
   @override
   void dispose() {
     _controller.removeListener(listener);
+    _selectedTimeController.dispose();
     super.dispose();
   }
 
   void listener() {
     if (mounted) {
+      final liveDurationTimes = LiveDurationCalculator.getDuration(
+          controller: _controller,
+          selectedTimeMs: _selectedTimeController.value);
+
+      final totalTimeMs = liveDurationTimes.totalVideoTimeMs;
+      final durationMs = liveDurationTimes.videoDurationMs;
+      //Init check for setting the initial time of the live view to
+      //the max time (i.e. setting it to "Live")
+      //_controller is not ready in the didChangeState or initState overrides,
+      //so need to do here
+      if (!_init && totalTimeMs > 0) {
+        _selectedTimeController.value = totalTimeMs;
+        _init = true;
+      }
+
+      final minimumTimeMs = totalTimeMs - durationMs;
+      final newPositionMs =
+          liveDurationTimes.selectedPositionMs - minimumTimeMs;
+
+      final double newPosition = totalTimeMs == 0 || newPositionMs < 0
+          ? 0
+          : newPositionMs / durationMs;
+
       setState(() {
-        final liveDurationTimes = LiveDurationCalculator.getDuration(
-            controller: _controller, selectedTimeMs: _selectedTimeMs);
-
-        final totalTimeMs = liveDurationTimes.totalVideoTimeMs;
-        final durationMs = liveDurationTimes.videoDurationMs;
-
-        final minimumTimeMs = totalTimeMs - durationMs;
-        final newPositionMs =
-            liveDurationTimes.selectedPositionMs - minimumTimeMs;
-
-        final double newPosition = totalTimeMs == 0 || newPositionMs < 0
-            ? 0
-            : newPositionMs / durationMs;
-
-        //Init check for setting the initial time of the live view to
-        //the max time (i.e. setting it to "Live")
-        //_controller is not ready in the didChangeState or initState overrides,
-        //so need to do here
-        if (!_init && totalTimeMs > 0) {
-          _selectedTimeMs = totalTimeMs;
-          _init = true;
-        }
         _currentSliderPosition = newPosition > 1 ? 1 : newPosition;
       });
     }
@@ -104,9 +103,14 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
       onTap: isRealtime
           ? null
           : () {
-        _controller.seekTo(Duration(
-            milliseconds: _controller.metadata.totalVideoLengthMs));
-        _selectedTimeMs = _controller.value.position.inMilliseconds;
+        final livestreamTimes = LiveDurationCalculator.getDuration(
+            controller: _controller,
+            selectedTimeMs: _selectedTimeController.value);
+        final newPosition = livestreamTimes.totalVideoTimeMs;
+
+        _controller.seekTo(Duration(milliseconds: newPosition));
+        _selectedTimeController.value =
+            _controller.value.position.inMilliseconds;
       },
       child: Material(
         color: isRealtime ? Colors.transparent : widget.liveUIColor,
@@ -129,7 +133,7 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
             width: 14.0,
           ),
           CurrentPosition(
-            selectedTimeMs: _selectedTimeMs,
+            selectedTimeMs: _selectedTimeController.value,
           ),
           Expanded(
             child: Padding(
@@ -138,24 +142,24 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
                 value: _currentSliderPosition,
                 onChanged: (value) {
                   final livestreamTimes = LiveDurationCalculator.getDuration(
-                      controller: _controller, selectedTimeMs: _selectedTimeMs);
+                    controller: _controller,
+                    selectedTimeMs: _selectedTimeController.value,
+                  );
                   final durationMs = livestreamTimes.videoDurationMs;
                   final vidLengthMs = livestreamTimes.totalVideoTimeMs;
-                  final minMs = durationMs - vidLengthMs;
+                  final minMs = vidLengthMs - durationMs;
 
                   final selectedPosition =
-                      (vidLengthMs * value).round() + minMs;
+                      (durationMs * value).round() + minMs;
                   final newPosition = selectedPosition > durationMs
                       ? maxDurationMs
                       : selectedPosition;
+                  _selectedTimeController.value = newPosition;
                   _controller.seekTo(
                     Duration(
                       milliseconds: newPosition,
                     ),
                   );
-                  setState(() {
-                    _selectedTimeMs = _controller.value.position.inMilliseconds;
-                  });
                 },
                 activeColor: widget.liveUIColor,
                 inactiveColor: Colors.transparent,
