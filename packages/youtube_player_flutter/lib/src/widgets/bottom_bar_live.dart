@@ -94,8 +94,7 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
 
   @override
   Widget build(BuildContext context) {
-    final isRealtime =
-        selectedTimeMs == _controller.metadata.totalVideoLengthMs;
+    final isRealtime = _currentSliderPosition == 1;
 
     //To keep consistent spacing, set live button to transparent / disabled
     //if the time bar is at maximum value
