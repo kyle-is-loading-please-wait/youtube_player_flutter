@@ -93,7 +93,7 @@ class _TouchShutterState extends State<TouchShutter> {
                 ),
               );
               delta = details.globalPosition.dx - dragStartPos;
-              final isLive = widget.controller?.flags.isLive ?? false;
+              final isLive = widget.controller?.metadata.isLive ?? false;
               seekToPosition =
                   (_controller.value.position.inMilliseconds + delta * 1000)
                       .round();
@@ -101,10 +101,10 @@ class _TouchShutterState extends State<TouchShutter> {
                 seekDuration = (delta < 0 ? "- " : "+ ") +
                     durationFormatter(
                         (delta < 0 ? -1 : 1) * (delta * 1000).round(),
-                        _controller.flags.isLive);
+                        _controller.metadata.isLive);
                 if (seekToPosition < 0) seekToPosition = 0;
                 seekPosition =
-                    durationFormatter(seekToPosition, _controller.flags.isLive);
+                    durationFormatter(seekToPosition, _controller.metadata.isLive);
               });
             },
             onHorizontalDragEnd: (_) {

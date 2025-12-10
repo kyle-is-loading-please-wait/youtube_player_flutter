@@ -253,7 +253,7 @@ class _YoutubePlayerState extends State<YoutubePlayer> {
               ? 1
               : 0,
       duration: const Duration(milliseconds: 300),
-      child: controller.flags.isLive
+      child: controller.metadata.isLive
           ? LiveBottomBar(
               liveUIColor: widget.liveUIColor,
               showLiveFullscreenButton:
@@ -294,7 +294,7 @@ class _YoutubePlayerState extends State<YoutubePlayer> {
               controller.value.position > const Duration(milliseconds: 100) &&
               !controller.value.isControlsVisible &&
               widget.showVideoProgressIndicator &&
-              !controller.flags.isLive)
+              !controller.metadata.isLive)
             Positioned(
               bottom: -7.0,
               left: -7.0,

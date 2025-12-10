@@ -95,6 +95,8 @@ class YoutubePlayerFlags {
     this.controlsVisibleAtStart = false,
     this.autoPlay = true,
     this.mute = false,
+    @Deprecated('This value is ignored. Metadata from the YouTube API call is '
+        'now used to check if video is live.')
     this.isLive = false,
     this.hideThumbnail = false,
     this.disableDragSeek = false,

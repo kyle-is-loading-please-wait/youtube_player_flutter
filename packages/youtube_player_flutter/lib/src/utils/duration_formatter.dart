@@ -37,7 +37,7 @@ String durationFormatter(int milliseconds, bool isLive) {
 
 String durationFormatterFromController(YoutubePlayerController controller,
     {int? selectedTimeMs}) {
-  final isLive = controller.flags.isLive;
+  final isLive = controller.metadata.isLive;
   final position = selectedTimeMs ?? controller.value.position.inMilliseconds;
   final videoLengthMs = controller.metadata.totalVideoLengthMs;
 
@@ -47,5 +47,5 @@ String durationFormatterFromController(YoutubePlayerController controller,
 
   final offset = videoLengthMs - position;
 
-  return durationFormatter(offset, controller.flags.isLive);
+  return durationFormatter(offset, isLive);
 }

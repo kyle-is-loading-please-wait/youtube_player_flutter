@@ -1,5 +1,5 @@
 //Maximum length of youtube live video in ms (12hr)
-const int _maxDurationMs = 43200000;
+const int maxDurationMs = 43200000;
 
 /// Meta data for Youtube Video.
 class YoutubeMetaData {
@@ -20,6 +20,8 @@ class YoutubeMetaData {
   /// rewound a total of 12hr at max
   final int totalVideoLengthMs;
 
+  final bool isLive;
+
   /// Creates [YoutubeMetaData] for Youtube Video.
   const YoutubeMetaData({
     this.videoId = '',
@@ -27,6 +29,7 @@ class YoutubeMetaData {
     this.author = '',
     this.duration = const Duration(),
     this.totalVideoLengthMs = 0,
+    this.isLive = false,
   });
 
   /// Creates [YoutubeMetaData] from raw json video data.
@@ -42,7 +45,7 @@ class YoutubeMetaData {
     //If a livestream is less than 12hr long, use the actual duration of the livestream
     late final int duration;
     if (isLive) {
-      duration = totalLength < _maxDurationMs ? totalLength : _maxDurationMs;
+      duration = totalLength < maxDurationMs ? totalLength : maxDurationMs;
     } else {
       duration = totalLength;
     }
@@ -53,6 +56,7 @@ class YoutubeMetaData {
       author: data['author'],
       duration: Duration(milliseconds: duration),
       totalVideoLengthMs: totalLength,
+      isLive: isLive,
     );
   }
 
