@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_player_flutter/src/utils/live_duration_calculator.dart';
 
 import '../../youtube_player_flutter.dart';
 import '../utils/youtube_player_controller.dart';
@@ -63,32 +64,21 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
 
   void listener() {
     if (mounted) {
-      //check to see if video is still ongoing stream
-      final isLessThanMaxTime =
-          _controller.metadata.totalVideoLengthMs < maxDurationMs;
-      int timeOffset = 0;
-
-      //offset the length of the video by the difference in the live video start
-      //time and the length of time since then
-      if (!isLessThanMaxTime) {
-        final startTime = _controller.metadata.startTime;
-        assert(startTime != null);
-        timeOffset = DateTime.now().difference(startTime!).inMilliseconds;
-      }
-
-      final int totalTimeMs =
-          _controller.metadata.totalVideoLengthMs + timeOffset;
-      final int durationMs =
-          _controller.value.metaData.duration.inMilliseconds + timeOffset;
-
-      final minimumTimeMs = totalTimeMs - durationMs;
-      final newPositionMs = selectedTimeMs - minimumTimeMs;
-
-      final double newPosition = totalTimeMs == 0 || newPositionMs < 0
-          ? 0
-          : newPositionMs / durationMs;
-
       setState(() {
+        final liveDurationTimes = LiveDurationCalculator.getDuration(
+            controller: _controller, selectedTimeMs: selectedTimeMs);
+
+        final totalTimeMs = liveDurationTimes.totalVideoTimeMs;
+        final durationMs = liveDurationTimes.videoDurationMs;
+
+        final minimumTimeMs = totalTimeMs - durationMs;
+        final newPositionMs =
+            liveDurationTimes.selectedPositionMs - minimumTimeMs;
+
+        final double newPosition = totalTimeMs == 0 || newPositionMs < 0
+            ? 0
+            : newPositionMs / durationMs;
+
         //Init check for setting the initial time of the live view to
         //the max time (i.e. setting it to "Live")
         //_controller is not ready in the didChangeState or initState overrides,
@@ -104,27 +94,31 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
 
   @override
   Widget build(BuildContext context) {
-    final isLive = selectedTimeMs == _controller.metadata.totalVideoLengthMs;
-    final liveButton = isLive
-        ? Container()
-        : InkWell(
-            onTap: () {
+    final isRealtime =
+        selectedTimeMs == _controller.metadata.totalVideoLengthMs;
+
+    //To keep consistent spacing, set live button to transparent / disabled
+    //if the time bar is at maximum value
+    final liveButton = InkWell(
+      onTap: isRealtime
+          ? null
+          : () {
               _controller.seekTo(Duration(
                   milliseconds: _controller.metadata.totalVideoLengthMs));
               selectedTimeMs = _controller.value.position.inMilliseconds;
             },
-            child: Material(
-              color: widget.liveUIColor,
-              child: const Text(
-                ' LIVE ',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12.0,
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
-            ),
-          );
+      child: Material(
+        color: isRealtime ? Colors.transparent : widget.liveUIColor,
+        child: Text(
+          ' LIVE ',
+          style: TextStyle(
+            color: isRealtime ? Colors.transparent : Colors.white,
+            fontSize: 12.0,
+            fontWeight: FontWeight.w300,
+          ),
+        ),
+      ),
+    );
     return Visibility(
       visible: _controller.value.isControlsVisible,
       child: Row(

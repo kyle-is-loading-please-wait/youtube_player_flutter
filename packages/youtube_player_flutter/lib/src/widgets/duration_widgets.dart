@@ -17,7 +17,7 @@ class CurrentPosition extends StatefulWidget {
   const CurrentPosition({
     super.key,
     this.controller,
-    this.selectedTimeMs = 0,
+    this.selectedTimeMs,
   });
 
   @override
@@ -62,6 +62,7 @@ class _CurrentPositionState extends State<CurrentPosition> {
 
     final timeDisplay = durationFormatterFromController(
       _controller,
+      countDown: false,
       selectedTimeMs: widget.selectedTimeMs,
     );
     final textWidget = Text(
@@ -134,6 +135,7 @@ class _RemainingDurationState extends State<RemainingDuration> {
 
     final timeDisplay = durationFormatterFromController(
       _controller,
+      countDown: true,
       selectedTimeMs: widget.selectedTimeMs,
     );
     final textWidget = Text(

@@ -38,6 +38,41 @@ class YoutubeMetaData {
     this.startTime,
   });
 
+  YoutubeMetaData copyWith({
+    /// Youtube video ID of the currently loaded video.
+    final String? videoId,
+
+    /// Video title of the currently loaded video.
+    final String? title,
+
+    /// Channel name or uploader of the currently loaded video.
+    final String? author,
+
+    /// Total duration of the currently loaded video.
+    final Duration? duration,
+
+    /// The actual total ms length of video
+    /// Livestreams can be many hundreds of hours long, but can only be
+    /// rewound a total of 12hr at max
+    final int? totalVideoLengthMs,
+
+    /// The YouTube API response value for if a video is live
+    final bool? isLive,
+
+    /// The start time ms since epoch
+    /// Used for live videos which are currently streaming and are less than 12hr long
+    final DateTime? startTime,
+  }) {
+    return YoutubeMetaData(
+        isLive: isLive ?? this.isLive,
+        totalVideoLengthMs: totalVideoLengthMs ?? this.totalVideoLengthMs,
+        duration: duration ?? this.duration,
+        videoId: videoId ?? this.videoId,
+        author: author ?? this.author,
+        title: title ?? this.title,
+        startTime: startTime ?? this.startTime);
+  }
+
   /// Creates [YoutubeMetaData] from raw json video data.
   factory YoutubeMetaData.fromRawData(dynamic rawData) {
     final data = rawData as Map<String, dynamic>;
