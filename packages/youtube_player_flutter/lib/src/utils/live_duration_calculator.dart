@@ -12,9 +12,6 @@ class LiveDurationCalculator {
     /// The time milliseconds selected by the livestream player
     required int selectedTimeMs,
   }) {
-    // final startTime = controller.metadata.startTime;
-    // assert(startTime != null, 'Start time must be specified for livestreams');
-    // final offset = DateTime.now().difference(startTime!).inMilliseconds;
     final offset = controller.metadata.totalVideoLengthMs -
         controller.metadata.startingVideoLengthMs;
     final positionMs = selectedTimeMs + offset;
@@ -30,6 +27,7 @@ class LiveDurationCalculator {
   }
 }
 
+/// Wrapper class to hold formatted times for livestreams
 class LivestreamTimes {
   final int videoDurationMs;
   final int selectedPositionMs;

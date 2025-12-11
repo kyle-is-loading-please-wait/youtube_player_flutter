@@ -153,15 +153,16 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
                   final minMs = vidLengthMs - durationMs;
 
                   final selectedPosition =
-                      (durationMs * value).round() + minMs;
-                  _selectedTimeController.value = selectedPosition;
-
-                  final newPosition = selectedPosition > durationMs
+                      (durationMs * value).round();
+                  final newPosition = selectedPosition > maxDurationMs
                       ? maxDurationMs
                       : selectedPosition;
+
+                  _selectedTimeController.value = newPosition + minMs;
+
                   _controller.seekTo(
                     Duration(
-                      milliseconds: newPosition,
+                      milliseconds: newPosition + minMs,
                     ),
                   );
                 },
