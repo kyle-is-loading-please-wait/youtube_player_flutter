@@ -50,9 +50,9 @@ String durationFormatterFromController(YoutubePlayerController controller,
   final offset =
       liveStreamTimes.totalVideoTimeMs - liveStreamTimes.selectedPositionMs;
 
-  // if (offset <= 0) {
-  //   return 'Live';
-  // }
+  if (offset <= 0) {
+    return 'Live';
+  }
 
   return durationFormatter(offset, isLive);
 }

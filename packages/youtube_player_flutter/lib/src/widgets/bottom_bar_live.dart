@@ -63,20 +63,24 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
 
   void listener() {
     if (mounted) {
+      // Init check for setting the initial time of the live view to
+      // the max time (i.e. setting it to "Live")
+      // _controller is not ready in the didChangeState or initState overrides,
+      // so need to do here
+      if (!_init && _controller.metadata.totalVideoLengthMs > 0) {
+        _selectedTimeController.value = _controller.metadata.totalVideoLengthMs;
+        _init = true;
+      }
+
       final liveDurationTimes = LiveDurationCalculator.getDuration(
           controller: _controller,
           selectedTimeMs: _selectedTimeController.value);
 
+      // final startingVideoLengthMs = _controller.metadata.startingVideoLengthMs;
       final totalTimeMs = liveDurationTimes.totalVideoTimeMs;
+
       final durationMs = liveDurationTimes.videoDurationMs;
-      //Init check for setting the initial time of the live view to
-      //the max time (i.e. setting it to "Live")
-      //_controller is not ready in the didChangeState or initState overrides,
-      //so need to do here
-      if (!_init && totalTimeMs > 0) {
-        _selectedTimeController.value = totalTimeMs;
-        _init = true;
-      }
+
 
       final minimumTimeMs = totalTimeMs - durationMs;
       final newPositionMs =
@@ -85,7 +89,6 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
       final double newPosition = totalTimeMs == 0 || newPositionMs < 0
           ? 0
           : newPositionMs / durationMs;
-
       setState(() {
         _currentSliderPosition = newPosition > 1 ? 1 : newPosition;
       });
@@ -94,23 +97,23 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
 
   @override
   Widget build(BuildContext context) {
-    //Hide the "Live" button if the stream is set to max value on slider
+    // Hide the "Live" button if the stream is set to max value on slider
     final isRealtime = _currentSliderPosition == 1;
 
-    //To keep consistent spacing, set live button to transparent / disabled
-    //if the time bar is at maximum value
+    // To keep consistent spacing, set live button to transparent / disabled
+    // if the time bar is at maximum value
     final liveButton = InkWell(
       onTap: isRealtime
           ? null
           : () {
-        final livestreamTimes = LiveDurationCalculator.getDuration(
-            controller: _controller,
-            selectedTimeMs: _selectedTimeController.value);
-        final newPosition = livestreamTimes.totalVideoTimeMs;
+        // Offset the time total by 20 seconds because the totalVideoLength can be behind
+        // the new value sent by the callback in raw_youtube_play.dart due to the tickrate
+        // of the callback
+        final int videoLengthMs = _controller.metadata.totalVideoLengthMs +
+            20000;
 
-        _controller.seekTo(Duration(milliseconds: newPosition));
-        _selectedTimeController.value =
-            _controller.value.position.inMilliseconds;
+        _selectedTimeController.value = videoLengthMs;
+        _controller.seekTo(Duration(milliseconds: videoLengthMs));
       },
       child: Material(
         color: isRealtime ? Colors.transparent : widget.liveUIColor,
@@ -151,10 +154,11 @@ class _LiveBottomBarState extends State<LiveBottomBar> {
 
                   final selectedPosition =
                       (durationMs * value).round() + minMs;
+                  _selectedTimeController.value = selectedPosition;
+
                   final newPosition = selectedPosition > durationMs
                       ? maxDurationMs
                       : selectedPosition;
-                  _selectedTimeController.value = newPosition;
                   _controller.seekTo(
                     Duration(
                       milliseconds: newPosition,
